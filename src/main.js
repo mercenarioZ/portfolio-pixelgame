@@ -1,4 +1,4 @@
-import { scaleFactor } from "./constants";
+import { dialogueText, scaleFactor } from "./constants";
 import { k } from "./kaboomContext";
 import { displayDialogue, setCamScale } from "./utils";
 
@@ -20,6 +20,8 @@ k.loadSprite("map", "./map.png");
 k.setBackground(k.Color.fromHex("#3498db"));
 
 k.scene("main", async () => {
+  displayDialogue(dialogueText.intro, () => {});
+  
   // write logic for the game here
   const mapData = await (await fetch("./map.json")).json();
 
@@ -39,9 +41,9 @@ k.scene("main", async () => {
     k.pos(), // position of the player
     k.scale(scaleFactor),
     {
-      speed: 244,
+      speed: 300,
       direction: "down",
-      isInDialogue: false, // prevent player from moving while in dialogue
+      isInDialogue: false,
     },
     "player", // a tag to identify the player for collision detection etc.
   ]);
@@ -63,7 +65,10 @@ k.scene("main", async () => {
           player.onCollide(boundary.name, () => {
             player.isInDialogue = true;
 
-            displayDialogue("TODO", () => (player.isInDialogue = false));
+            displayDialogue(
+              dialogueText[boundary.name],
+              () => (player.isInDialogue = false)
+            );
           });
         }
       }
@@ -144,10 +149,71 @@ k.scene("main", async () => {
     }
   });
 
+  function stopAnimation() {
+    player.play(`idle-${player.direction}`);
+  }
+
   k.onMouseRelease(() => {
-    player.play(`idle-${player.direction}`)
+    stopAnimation();
     return;
-  })
+  });
+
+  k.onKeyRelease(() => {
+    stopAnimation();
+    return;
+  });
+
+  k.onKeyDown((key) => {
+    const keyMap = [
+      k.isKeyDown("up"),
+      k.isKeyDown("right"),
+      k.isKeyDown("down"),
+      k.isKeyDown("left"),
+    ];
+
+    if (player.isInDialogue) return;
+
+    // when user presses more than 1 key, stop the animation
+    if (keyMap.filter((key) => key).length > 1) {
+      stopAnimation();
+      return;
+    }
+
+    if (keyMap[0]) {
+      if (player.curAnim() !== "walk-up") player.play("walk-up");
+      player.direction = "up";
+      player.move(0, -player.speed);
+
+      return;
+    }
+
+    if (keyMap[1]) {
+      player.flipX = false;
+      if (player.curAnim() !== "walk-side") player.play("walk-side");
+      player.direction = "side";
+      player.move(player.speed, 0);
+
+      return;
+    }
+
+    if (keyMap[2]) {
+      if (player.curAnim() !== "walk-down") player.play("walk-down");
+      player.direction = "down";
+      player.move(0, player.speed);
+
+      return;
+    }
+
+    if (keyMap[3]) {
+      player.flipX = true;
+
+      if (player.curAnim() !== "walk-side") player.play("walk-side");
+      player.direction = "side";
+      player.move(-player.speed, 0);
+
+      return;
+    }
+  });
 });
 
 k.go("main");

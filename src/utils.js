@@ -5,24 +5,24 @@ export function displayDialogue(text, onDisplayEnd) {
   textboxContainer.style.display = "block";
   let index = 0;
   let currentText = "";
-  const intervalRef = setInterval(() => {
+  const displayText = setInterval(() => {
     if (index < text.length) {
       currentText += text[index];
-      dialogue.innerText = currentText;
+      dialogue.innerHTML = currentText;
       index++;
       return;
     }
 
-    clearInterval(intervalRef);
-  }, 30);
+    clearInterval(displayText);
+  }, 16);
 
   const closeBtn = document.getElementById("close");
 
   function onCloseBtnClick() {
     onDisplayEnd();
     textboxContainer.style.display = "none";
-    dialogue.innerText = "";
-    clearInterval(intervalRef);
+    dialogue.innerHTML = "";
+    clearInterval(displayText);
     closeBtn.removeEventListener("click", onCloseBtnClick);
   }
 
@@ -30,7 +30,7 @@ export function displayDialogue(text, onDisplayEnd) {
 
   addEventListener("keypress", (key) => {
     if (key.code === "Enter") {
-      closeBtn.click();
+      onCloseBtnClick();
     }
   });
 }

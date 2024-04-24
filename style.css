@@ -42,8 +42,8 @@ body {
 .ui-close-btn {
   font-family: monogram, monospace;
   border-style: none;
-  border-radius: 3px;
-  padding: 1rem;
+  border-radius: 4px;
+  padding: .8rem;
   font-size: inherit;
 }
 
@@ -53,11 +53,19 @@ body {
 }
 
 .note {
+  background: white;
+  border-radius: 3px;
+  color: black;
   position: absolute;
-  left: 5%;
-  top: 1vh;
+  left: 3%;
+  top: .25vh;
   display: flex;
   flex-direction: column;
-  color: rgb(238, 238, 238);
+  user-select: none;
+  padding: .5rem;
+  opacity: 70%;
+}
+
+#close {
   user-select: none;
 }
